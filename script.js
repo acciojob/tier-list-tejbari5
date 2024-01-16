@@ -1,23 +1,21 @@
 //your JS code here. If required.
-let dropZones = document.querySelectorAll(".drop-zone");
-let items = document.querySelectorAll(".item");
-let dragItem = null;
-for ( let i = 0; i < items.length; i++ ){
-    items[i].addEventListener("dragstart", onDragStart);
-}
-for (let i = 0; i < dropZones.length; i++ ){
-    dropZones[i].addEventListener("dragover", onDragOver);
-    dropZones[i].addEventListener("drop", onDrop);
-}
-function onDragStart(event){
-    
-    dragItem = event.target;
-}
-function onDragOver(event){
-    
-    event.preventDefault();
-}
-function onDrop(event){
-    
-    event.target.appendChild(dragItem);
-}
+let selectedSquare;
+const unrankedDropZone = document.getElementById("unranked-drop-zone");
+
+//--ITEMS
+document.querySelectorAll(".item").forEach((square) => {
+  square.addEventListener("dragstart", (e) => (selectedSquare = e.target));
+  square.addEventListener("dblclick", function () {
+    if (this.parentElement != unrankedDropZone)
+      unrankedDropZone.appendChild(this);
+  });
+});
+
+//--ZONES
+document.querySelectorAll(".drop-zone").forEach((dropZone) => {
+  dropZone.addEventListener("dragover", (e) => e.preventDefault());
+  dropZone.addEventListener("drop", function () {
+    if (selectedSquare.parentElement === this) return;
+    this.appendChild(selectedSquare);
+  });
+});
