@@ -1,44 +1,45 @@
-//your JS code here. If required.
 document.addEventListener('DOMContentLoaded', function () {
-  const items = document.querySelectorAll('.item');
-  const dropZones = document.querySelectorAll('.drop-zone');
+    const items = document.querySelectorAll('.item');
+    const dropZones = document.querySelectorAll('.drop-zone');
 
-  let draggedItem = null;
+    items.forEach(item => {
+        item.addEventListener('dragstart', handleDragStart);
+        item.addEventListener('dblclick', handleDoubleClick);
+    });
 
-  function handleDragStart(event) {
-    draggedItem = event.target;
-    event.dataTransfer.setData('text/plain', ''); // Required for Firefox to initiate drag
-  }
+    dropZones.forEach(zone => {
+        zone.addEventListener('dragover', handleDragOver);
+        zone.addEventListener('drop', handleDrop);
+    });
 
-  function handleDragOver(event) {
-    event.preventDefault();
-  }
-
-  function handleDrop(event) {
-    event.preventDefault();
-    const dropZone = event.target.closest('.drop-zone');
-
-    if (dropZone && !dropZone.contains(draggedItem)) {
-      dropZone.appendChild(draggedItem);
+    function handleDragStart(event) {
+        event.dataTransfer.setData('text/plain', event.target.id);
     }
 
-    draggedItem = null;
-  }
-
-  function handleDoubleClick(event) {
-    const unrankedDropZone = document.getElementById('unranked-drop-zone');
-    if (event.target.classList.contains('item') && !unrankedDropZone.contains(event.target)) {
-      unrankedDropZone.appendChild(event.target);
+    function handleDragOver(event) {
+        event.preventDefault();
     }
-  }
 
-  items.forEach(item => {
-    item.addEventListener('dragstart', handleDragStart);
-    item.addEventListener('dblclick', handleDoubleClick);
-  });
+    function handleDrop(event) {
+        event.preventDefault();
+        const itemId = event.dataTransfer.getData('text/plain');
+        const item = document.getElementById(itemId);
 
-  dropZones.forEach(dropZone => {
-    dropZone.addEventListener('dragover', handleDragOver);
-    dropZone.addEventListener('drop', handleDrop);
-  });
+        if (!item) return;
+
+        // Check if the item is being moved to a different drop zone
+        if (!event.target.contains(item)) {
+            event.target.appendChild(item);
+        }
+    }
+
+    function handleDoubleClick(event) {
+        const itemId = event.target.id;
+        const unrankedDropZone = document.getElementById('unranked-drop-zone');
+        const item = document.getElementById(itemId);
+
+        if (unrankedDropZone.contains(item)) return;
+
+        unrankedDropZone.appendChild(item);
+    }
 });
